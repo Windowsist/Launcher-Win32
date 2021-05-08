@@ -3,7 +3,7 @@
 # to build this project, do the following steps:
 # 1.open Visual Studio Developer Command Prompt (for example: open "x64 Native Tools Command Prompt for VS 2019")
 # 2.change the working directory to the project directory 
-# 3.type "nmake build"
+# 3.type "nmake Debug" or "nmake Release"
 #
 # if you whant to edit the source code, you can use Visual Studio Code.
 #
@@ -13,15 +13,35 @@
 # vcruntime.lib -> api-ms-win-crt-private-l1-1-0.lib (extracted from api-ms-win-crt-private-l1-1-0.dll)
 # msvcprt.lib -> msvcp_win.lib (extracted from msvcp_win.dll)
 
-# Debug:
-# CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8 /Zi
-# Release:
-# CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8 /O2 /Ob2 /GL
+CFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c17 /utf-8
+CXXFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8
+CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8
 
-build: Launcher.exe
+CFLAGS_DEBUG=/Zi
+CFLAGS_RELEASE=/O2 /Ob2 /GL
 
-Launcher.exe: Launcher.cpp Launcher.h
-	$(CPP) $(CPPFLAGS) Launcher.cpp /link /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED noarg.obj OneCore.lib
+CPPFLAGS_DEBUG=/Zi
+CPPFLAGS_RELEASE=/O2 /Ob2 /GL
+
+CXXFLAGS_DEBUG=/Zi
+CXXFLAGS_RELEASE=/O2 /Ob2 /GL
+
+Debug: build\Debug\Launcher.exe
+
+build\Debug\Launcher.exe: build\Debug Windowsist.WINAPI.manifest Launcher.cpp
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) Launcher.cpp /Fo: build\Debug\ /Fd: build\Debug\ /Fe: $@ /link /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED noarg.obj OneCore.lib
+
+build\Debug:
+	mkdir $@
+
+Release: build\Release\Launcher.exe
+
+build\Release\Launcher.exe: build\Release Windowsist.WINAPI.manifest Launcher.cpp
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) Launcher.cpp /Fo: build\Release\ /Fe: $@ /link /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED noarg.obj OneCore.lib
+
+build\Release:
+	mkdir $@
 
 clean:
-	@for %i in (*.obj *.res *.ilk *.pdb *.exe) do @del "%i"
+	@rd /s /q build
+
