@@ -2,55 +2,63 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include <stdlib.h>
+// #include <stdlib.h>
 
 #include "Launcher.h"
 
-int APIENTRY wWinMain
-(
-	_In_ HINSTANCE /* hInstance */,
-	_In_opt_ HINSTANCE /* hPrevInstance */,
-	_In_ LPWSTR /* lpCmdLine */,
-	_In_ int /* nCmdShow */
-)
+// int APIENTRY wWinMain
+// (
+// 	_In_ HINSTANCE /* hInstance */,
+// 	_In_opt_ HINSTANCE /* hPrevInstance */,
+// 	_In_ LPWSTR /* lpCmdLine */,
+// 	_In_ int /* nCmdShow */
+// )
+UINT Main()
 {
-	wchar_t file[260];
+	wchar_t file[260], launcherdir[260];
 	if (!GetModuleFileNameW(nullptr, file, 260))
 	{
-		ErrorMsg(GetLastError());
-		return 0;
+		RaiseException(GetLastError(), 0, 0, nullptr);
 	}
-	wchar_t launcherdir[260];
 	{
-		size_t len = wcslen(file);
-		wcscpy(file + len - 3, L"ini");
+		size_t len = lstrlenW(file);
+		lstrcpyW(file + len - 3, L"ini");
+		{
+			HANDLE hFile = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+			if (hFile == INVALID_HANDLE_VALUE)
+			{
+				RaiseException(GetLastError(), 0, 0, nullptr);
+			}
+			else
+			{
+				CloseHandle(hFile);
+			}
+		}
 		while (len && file[len] != L'\\')
 		{
 			len--;
 		}
-		wcsncpy(launcherdir, file, len);
-		launcherdir[len] = L'\0';
+		lstrcpynW(launcherdir, file, len + 1);
 	}
 	if (!SetEnvironmentVariableW(L"LauncherDir", launcherdir))
 	{
-		ErrorMsg(GetLastError());
-		return 0;
+		RaiseException(GetLastError(), 0, 0, nullptr);
 	}
 	LPWSTR AppPath, WorkingDirectory, CommandLine;
 	{
-		DWORD length = 8, lastError = 0;
-		LPWSTR buffer = (LPWSTR)calloc(16, sizeof(wchar_t));
+		DWORD length, lastError;
+		LPWSTR buffer = (LPWSTR)Malloc((length = 8) * sizeof(wchar_t));
 		while (true)
 		{
 			GetPrivateProfileStringW(L"LaunchApp", L"AppPath", nullptr, buffer, length, file);
 			lastError = GetLastError();
 			if (lastError == ERROR_MORE_DATA) //buffer too small
 			{
-				buffer = (LPWSTR)_recalloc(buffer, (length *= 2), sizeof(wchar_t));
+				buffer = (LPWSTR)ReAlloc(buffer, (length *= 2) * sizeof(wchar_t));
 			}
 			else if (!lastError) //success
 			{
-				AppPath = expenv(buffer);
+				AppPath = Expenv(buffer);
 				break;
 			}
 			else if (lastError == ERROR_FILE_NOT_FOUND) //not defined
@@ -60,8 +68,7 @@ int APIENTRY wWinMain
 			}
 			else
 			{
-				ErrorMsg(lastError);
-				return 0;
+				RaiseException(lastError, 0, 0, nullptr);
 			}
 		}
 		while (true)
@@ -70,11 +77,11 @@ int APIENTRY wWinMain
 			lastError = GetLastError();
 			if (lastError == ERROR_MORE_DATA) //buffer too small
 			{
-				buffer = (LPWSTR)_recalloc(buffer, (length *= 2), sizeof(wchar_t));
+				buffer = (LPWSTR)ReAlloc(buffer, (length *= 2) * sizeof(wchar_t));
 			}
 			else if (!lastError) //success
 			{
-				WorkingDirectory = expenv(buffer);
+				WorkingDirectory = Expenv(buffer);
 				break;
 			}
 			else if (lastError == ERROR_FILE_NOT_FOUND) //not defined
@@ -84,8 +91,7 @@ int APIENTRY wWinMain
 			}
 			else
 			{
-				ErrorMsg(lastError);
-				return 0;
+				RaiseException(lastError, 0, 0, nullptr);
 			}
 		}
 		while (true)
@@ -94,11 +100,11 @@ int APIENTRY wWinMain
 			lastError = GetLastError();
 			if (lastError == ERROR_MORE_DATA) //buffer too small
 			{
-				buffer = (LPWSTR)_recalloc(buffer, (length *= 2), sizeof(wchar_t));
+				buffer = (LPWSTR)ReAlloc(buffer, (length *= 2) * sizeof(wchar_t));
 			}
 			else if (!lastError) //success
 			{
-				CommandLine = expenv(buffer);
+				CommandLine = Expenv(buffer);
 				break;
 			}
 			else if (lastError == ERROR_FILE_NOT_FOUND) //not defined
@@ -108,8 +114,7 @@ int APIENTRY wWinMain
 			}
 			else
 			{
-				ErrorMsg(lastError);
-				return 0;
+				RaiseException(lastError, 0, 0, nullptr);
 			}
 		}
 		while (true)
@@ -118,15 +123,18 @@ int APIENTRY wWinMain
 			lastError = GetLastError();
 			if (lastError == ERROR_MORE_DATA) //buffer too small
 			{
-				buffer = (LPWSTR)_recalloc(buffer, (length *= 2), sizeof(wchar_t));
+				buffer = (LPWSTR)ReAlloc(buffer, (length *= 2) * sizeof(wchar_t));
 			}
 			else if (!lastError) //success
 			{
-				for (LPWSTR env = buffer; wcslen(env); env += wcslen(env) + 1)
+				for (LPWSTR env = buffer; lstrlenW(env); env += lstrlenW(env) + 1)
 				{
-					LPWSTR enve = expenv(env);
-					_wputenv(enve);
-					free(enve);
+					LPWSTR enve = Expenv(env);
+					if (!PutenvW(enve))
+					{
+						RaiseException(GetLastError(), 0, 0, nullptr);
+					}
+					Free(enve)
 				}
 				break;
 			}
@@ -136,17 +144,15 @@ int APIENTRY wWinMain
 			}
 			else
 			{
-				ErrorMsg(lastError);
-				return 0;
+				RaiseException(lastError, 0, 0, nullptr);
 			}
 
 		}
-		free(buffer);
+		Free(buffer)
 	}
 	if (!SetEnvironmentVariableW(L"LauncherDir", nullptr))
 	{
-		ErrorMsg(GetLastError());
-		return 0;
+		RaiseException(GetLastError(), 0, 0, nullptr);
 	}
 	{
 		PROCESS_INFORMATION pi;
@@ -157,7 +163,7 @@ int APIENTRY wWinMain
 		}
 		if (!success)
 		{
-			ErrorMsg(GetLastError());
+			RaiseException(GetLastError(), 0, 0, nullptr);
 		}
 		else
 		{
@@ -165,9 +171,18 @@ int APIENTRY wWinMain
 			CloseHandle(pi.hThread);
 		}
 	}
-	if (AppPath)free(AppPath);
-	if (WorkingDirectory)free(WorkingDirectory);
-	if (CommandLine)free(CommandLine);
+	if (AppPath)
+	{
+		Free(AppPath)
+	}
+	if (WorkingDirectory)
+	{
+		Free(WorkingDirectory)
+	}
+	if (CommandLine)
+	{
+		Free(CommandLine)
+	}
 	return 0;
 }
 
@@ -184,14 +199,91 @@ void ErrorMsg(DWORD ErrorId)
 		0,
 		nullptr
 	);
-	MessageBoxW(nullptr, lpBuffer, nullptr, MB_ICONERROR);
-	LocalFree(lpBuffer);
+	if (!lpBuffer)
+	{
+		FormatMessageW
+		(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			nullptr,
+			E_UNEXPECTED,
+			0,
+			(LPWSTR)&lpBuffer,
+			0,
+			nullptr
+		);
+	}
+	if (!lpBuffer)
+	{
+		RaiseException(GetLastError(), 0, 0, nullptr);
+	}
+	else
+	{
+		MessageBoxW(nullptr, lpBuffer, nullptr, MB_ICONERROR);
+		if (LocalFree(lpBuffer))
+		{
+			RaiseException(GetLastError(), 0, 0, nullptr);
+		}
+	}
 }
 
-LPWSTR expenv(LPWSTR raw)
+LPWSTR Expenv(LPWSTR lpSrc)
 {
-	DWORD len = ExpandEnvironmentStringsW(raw, nullptr, 0);
-	LPWSTR value = (LPWSTR)calloc(len, sizeof(wchar_t));
-	ExpandEnvironmentStringsW(raw, value, len);
+	DWORD len = ExpandEnvironmentStringsW(lpSrc, nullptr, 0);
+	if (!len)
+	{
+		RaiseException(GetLastError(), 0, 0, nullptr);
+	}
+	LPWSTR value = (LPWSTR)Malloc(len * sizeof(wchar_t));
+	if (!ExpandEnvironmentStringsW(lpSrc, value, len))
+	{
+		RaiseException(GetLastError(), 0, 0, nullptr);
+	}
 	return value;
+}
+
+BOOL PutenvW(LPWSTR lpEnv)
+{
+	int i, len = lstrlenW(lpEnv);
+	for (i = 0; i < len; i++)
+	{
+		if (lpEnv[i] == L'=')
+		{
+			break;
+		}
+	}
+	if (i == len)
+	{
+		return SetEnvironmentVariableW(lpEnv, nullptr); // delete EnvironmentVariable
+	}
+	else
+	{
+		lpEnv[i] = L'\0';
+		BOOL result = SetEnvironmentVariableW(lpEnv, lpEnv + i + 1);
+		lpEnv[i] = L'=';
+		return result;
+	}
+}
+
+__declspec(noinline) UINT __Startup()
+{
+	__try
+	{
+		hHeap = GetProcessHeap();
+		if (!hHeap)
+		{
+			RaiseException(GetLastError(), 0, 0, nullptr);
+		}
+		return Main();
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		ErrorMsg(GetExceptionCode());
+		return 0;
+	}
+}
+
+extern "C" DWORD Startup(LPVOID)
+{
+	ExitProcess(__Startup());
+	return 0UL;
 }

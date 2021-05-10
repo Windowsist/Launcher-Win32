@@ -13,23 +13,23 @@
 # vcruntime.lib -> api-ms-win-crt-private-l1-1-0.lib (extracted from api-ms-win-crt-private-l1-1-0.dll)
 # msvcprt.lib -> msvcp_win.lib (extracted from msvcp_win.dll)
 
-CFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c17 /utf-8
-CXXFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8
-CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8
+CFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8
+CXXFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /await /bigobj /utf-8
+CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /await /bigobj /utf-8
 
-CFLAGS_DEBUG=/Zi
-CFLAGS_RELEASE=/O2 /Ob2 /GL
+CFLAGS_DEBUG=/Zi /sdl # /RTC1
+CFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
 
-CPPFLAGS_DEBUG=/Zi
-CPPFLAGS_RELEASE=/O2 /Ob2 /GL
+CPPFLAGS_DEBUG=/Zi /sdl # /RTC1
+CPPFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
 
-CXXFLAGS_DEBUG=/Zi
-CXXFLAGS_RELEASE=/O2 /Ob2 /GL
+CXXFLAGS_DEBUG=/Zi /sdl # /RTC1
+CXXFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
 
 Debug: build\Debug\Launcher.exe
 
 build\Debug\Launcher.exe: build\Debug Windowsist.WINAPI.manifest Launcher.cpp
-	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) Launcher.cpp /Fo: build\Debug\ /Fd: build\Debug\ /Fe: $@ /link /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED noarg.obj OneCore.lib
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) Launcher.cpp /Fo: build\Debug\ /Fd: build\Debug\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED OneCore.lib
 
 build\Debug:
 	mkdir $@
@@ -37,7 +37,7 @@ build\Debug:
 Release: build\Release\Launcher.exe
 
 build\Release\Launcher.exe: build\Release Windowsist.WINAPI.manifest Launcher.cpp
-	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) Launcher.cpp /Fo: build\Release\ /Fe: $@ /link /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED noarg.obj OneCore.lib
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) Launcher.cpp /Fo: build\Release\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED OneCore.lib
 
 build\Release:
 	mkdir $@
