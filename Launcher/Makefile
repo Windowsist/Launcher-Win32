@@ -14,8 +14,8 @@
 # msvcprt.lib -> msvcp_win.lib (extracted from msvcp_win.dll)
 
 CFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8
-CXXFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /await /bigobj /utf-8
-CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /await /bigobj /utf-8
+CXXFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8
+CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8
 
 CFLAGS_DEBUG=/Zi /sdl # /RTC1
 CFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
@@ -26,18 +26,26 @@ CPPFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
 CXXFLAGS_DEBUG=/Zi /sdl # /RTC1
 CXXFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
 
+RFLAGS=/nologo
+
 Debug: build\Debug\Launcher.exe
 
-build\Debug\Launcher.exe: build\Debug Windowsist.WINAPI.manifest Launcher.cpp
-	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) Launcher.cpp /Fo: build\Debug\ /Fd: build\Debug\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED OneCore.lib
+build\Debug\Launcher.exe: build\Debug Windowsist.WINAPI.manifest Launcher.cpp build\Debug\Launcher.res
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) Launcher.cpp /Fo: build\Debug\ /Fd: build\Debug\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED build\Debug\Launcher.res OneCore.lib
+
+build\Debug\Launcher.res: Launcher.rc
+	$(RC) $(RFLAGS) /fo $@ $**
 
 build\Debug:
 	mkdir $@
 
 Release: build\Release\Launcher.exe
 
-build\Release\Launcher.exe: build\Release Windowsist.WINAPI.manifest Launcher.cpp
-	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) Launcher.cpp /Fo: build\Release\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED OneCore.lib
+build\Release\Launcher.exe: build\Release Windowsist.WINAPI.manifest Launcher.cpp build\Release\Launcher.res
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) Launcher.cpp /Fo: build\Release\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED build\Release\Launcher.res OneCore.lib
+
+build\Release\Launcher.res: Launcher.rc
+	$(RC) $(RFLAGS) /fo $@ $**
 
 build\Release:
 	mkdir $@
