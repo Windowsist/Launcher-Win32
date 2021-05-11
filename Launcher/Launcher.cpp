@@ -20,10 +20,10 @@ UINT Main()
 	{
 		RaiseException(GetLastError(), 0, 0, nullptr);
 	}
-	{
+	{ // stack: size_t len;
 		size_t len = lstrlenW(file);
 		lstrcpyW(file + len - 3, L"ini");
-		{
+		{ // stack: HANDLE hFile;
 			HANDLE hFile = CreateFileW(file, 0, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 			if (hFile == INVALID_HANDLE_VALUE)
 			{
@@ -48,7 +48,7 @@ UINT Main()
 		RaiseException(GetLastError(), 0, 0, nullptr);
 	}
 	LPWSTR AppPath, WorkingDirectory, CommandLine;
-	{
+	{ // stack: DWORD length, lastError; LPWSTR buffer;
 		DWORD length, lastError;
 		LPWSTR buffer = (LPWSTR)Malloc((length = 8) * sizeof(wchar_t));
 		while (true)
@@ -157,10 +157,10 @@ UINT Main()
 	{
 		RaiseException(GetLastError(), 0, 0, nullptr);
 	}
-	{
+	{ // stack: PROCESS_INFORMATION pi; BOOL success;
 		PROCESS_INFORMATION pi;
 		BOOL success;
-		{
+		{ // stack: STARTUPINFOW si
 			STARTUPINFOW si = { sizeof(STARTUPINFOW) };
 			success = CreateProcessW(AppPath, CommandLine, nullptr, nullptr, FALSE, 0, nullptr, WorkingDirectory, &si, &pi);
 		}
@@ -197,42 +197,6 @@ UINT Main()
 
 void ErrorMsg(DWORD ErrorId)
 {
-	LPWSTR lpBuffer;
-	FormatMessageW
-	(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr,
-		ErrorId,
-		0,
-		(LPWSTR)&lpBuffer,
-		0,
-		nullptr
-	);
-	if (!lpBuffer)
-	{
-		FormatMessageW
-		(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr,
-			E_UNEXPECTED,
-			0,
-			(LPWSTR)&lpBuffer,
-			0,
-			nullptr
-		);
-	}
-	if (!lpBuffer)
-	{
-		RaiseException(GetLastError(), 0, 0, nullptr);
-	}
-	else
-	{
-		MessageBoxW(nullptr, lpBuffer, nullptr, MB_ICONERROR);
-		if (LocalFree(lpBuffer))
-		{
-			RaiseException(GetLastError(), 0, 0, nullptr);
-		}
-	}
 }
 
 LPWSTR Expenv(LPCWSTR lpSrc)
@@ -277,7 +241,7 @@ __declspec(noinline) UINT __Startup()
 {
 	__try
 	{
-		hHeap = GetProcessHeap();
+		hHeap = GetProcessHeap(); //initialize global
 		if (!hHeap)
 		{
 			RaiseException(GetLastError(), 0, 0, nullptr);
@@ -286,7 +250,42 @@ __declspec(noinline) UINT __Startup()
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
-		ErrorMsg(GetExceptionCode());
+		LPWSTR lpBuffer;
+		FormatMessageW
+		(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			nullptr,
+			GetExceptionCode(),
+			0,
+			(LPWSTR)&lpBuffer,
+			0,
+			nullptr
+		);
+		if (!lpBuffer)
+		{
+			FormatMessageW
+			(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				nullptr,
+				E_UNEXPECTED,
+				0,
+				(LPWSTR)&lpBuffer,
+				0,
+				nullptr
+			);
+			if (!lpBuffer)
+			{
+				return GetLastError();
+			}
+		}
+		else
+		{
+			MessageBoxW(nullptr, lpBuffer, nullptr, MB_ICONERROR);
+			if (LocalFree(lpBuffer))
+			{
+				return GetLastError();
+			}
+		}
 		return 0;
 	}
 }

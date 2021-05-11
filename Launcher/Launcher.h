@@ -2,8 +2,6 @@
 
 HANDLE hHeap;
 
-void ErrorMsg(DWORD ErrorId);
-
 LPWSTR Expenv(LPCWSTR lpSrc);
 
 BOOL PutenvW(LPWSTR lpEnv);
