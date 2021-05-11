@@ -1,13 +1,15 @@
 ﻿#pragma once
 
-HANDLE hHeap;
+HANDLE hProcessHeap;
 
-LPWSTR Expenv(LPCWSTR lpSrc);
+// ExpandEnvironmentString
+LPWSTR ExpEnvW(LPCWSTR lpSrc);
 
-BOOL PutenvW(LPWSTR lpEnv);
+// SetEnvironmentVariable
+inline BOOL PutEnvW(LPWSTR lpEnv);
 
-#define Malloc(dwBytes)HeapAlloc(hHeap, HEAP_GENERATE_EXCEPTIONS, dwBytes)
+#define Malloc(dwBytes)HeapAlloc(hProcessHeap, HEAP_GENERATE_EXCEPTIONS, dwBytes)
 
-#define ReAlloc(lpMem, dwBytes) HeapReAlloc(hHeap, HEAP_GENERATE_EXCEPTIONS, lpMem, dwBytes)
+#define ReAlloc(lpMem, dwBytes) HeapReAlloc(hProcessHeap, HEAP_GENERATE_EXCEPTIONS, lpMem, dwBytes)
 
-#define Free(lpMem) if (!HeapFree(hHeap, 0, lpMem)) { RaiseException(GetLastError(), 0, 0, nullptr); }
+#define Free(lpMem) if (!HeapFree(hProcessHeap, 0, lpMem)) { RaiseException(GetLastError(), 0, 0, nullptr); }

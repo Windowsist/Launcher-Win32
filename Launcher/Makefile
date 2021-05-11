@@ -13,9 +13,9 @@
 # vcruntime.lib -> api-ms-win-crt-private-l1-1-0.lib (extracted from api-ms-win-crt-private-l1-1-0.dll)
 # msvcprt.lib -> msvcp_win.lib (extracted from msvcp_win.dll)
 
-CFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8
-CXXFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8
-CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8
+CFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8 /Wall
+CXXFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8 /Wall
+CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /utf-8 /Wall
 
 CFLAGS_DEBUG=/Zi /sdl # /RTC1
 CFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
