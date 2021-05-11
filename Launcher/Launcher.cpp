@@ -24,14 +24,17 @@ UINT Main()
 		size_t len = lstrlenW(file);
 		lstrcpyW(file + len - 3, L"ini");
 		{
-			HANDLE hFile = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+			HANDLE hFile = CreateFileW(file, 0, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 			if (hFile == INVALID_HANDLE_VALUE)
 			{
 				RaiseException(GetLastError(), 0, 0, nullptr);
 			}
 			else
 			{
-				CloseHandle(hFile);
+				if (!CloseHandle(hFile))
+				{
+					RaiseException(GetLastError(), 0, 0, nullptr);
+				}
 			}
 		}
 		while (len && file[len] != L'\\')
@@ -167,8 +170,14 @@ UINT Main()
 		}
 		else
 		{
-			CloseHandle(pi.hProcess);
-			CloseHandle(pi.hThread);
+			if (!CloseHandle(pi.hProcess))
+			{
+				RaiseException(GetLastError(), 0, 0, nullptr);
+			}
+			if (!CloseHandle(pi.hThread))
+			{
+				RaiseException(GetLastError(), 0, 0, nullptr);
+			}
 		}
 	}
 	if (AppPath)
@@ -226,7 +235,7 @@ void ErrorMsg(DWORD ErrorId)
 	}
 }
 
-LPWSTR Expenv(LPWSTR lpSrc)
+LPWSTR Expenv(LPCWSTR lpSrc)
 {
 	DWORD len = ExpandEnvironmentStringsW(lpSrc, nullptr, 0);
 	if (!len)

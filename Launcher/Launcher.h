@@ -4,7 +4,7 @@ HANDLE hHeap;
 
 void ErrorMsg(DWORD ErrorId);
 
-LPWSTR Expenv(LPWSTR lpSrc);
+LPWSTR Expenv(LPCWSTR lpSrc);
 
 BOOL PutenvW(LPWSTR lpEnv);
 
