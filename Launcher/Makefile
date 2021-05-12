@@ -30,7 +30,7 @@ RFLAGS=/nologo
 
 Debug: build\Debug\Launcher.exe
 
-build\Debug\Launcher.exe: build\Debug Windowsist.WINAPI.manifest Launcher.cpp build\Debug\Launcher.res
+build\Debug\Launcher.exe: build\Debug Windowsist.WINAPI.manifest Launcher.cpp Memory.inl Environment.inl Main.inl Startup.inl build\Debug\Launcher.res
 	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) Launcher.cpp /Fo: build\Debug\ /Fd: build\Debug\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED build\Debug\Launcher.res OneCore.lib
 
 build\Debug\Launcher.res: Launcher.rc
@@ -41,7 +41,7 @@ build\Debug:
 
 Release: build\Release\Launcher.exe
 
-build\Release\Launcher.exe: build\Release Windowsist.WINAPI.manifest Launcher.cpp build\Release\Launcher.res
+build\Release\Launcher.exe: build\Release Windowsist.WINAPI.manifest Launcher.cpp Memory.inl Environment.inl Main.inl Startup.inl build\Release\Launcher.res
 	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) Launcher.cpp /Fo: build\Release\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED build\Release\Launcher.res OneCore.lib
 
 build\Release\Launcher.res: Launcher.rc
