@@ -278,7 +278,8 @@ __declspec(noinline) UINT __Startup() // noinline: ensure stack will be cleaned 
 			nullptr
 		))
 		{
-			if (GetLastError() == ERROR_MUI_FILE_NOT_FOUND) // not system error, unexpected
+			DWORD err = GetLastError();
+			if (err == ERROR_MUI_FILE_NOT_FOUND) // not system error, unexpected
 			{
 				if (!FormatMessageW
 				(
@@ -294,14 +295,15 @@ __declspec(noinline) UINT __Startup() // noinline: ensure stack will be cleaned 
 					return GetLastError(); // unexpected and unable to display
 				}
 			}
-		}
-		else
-		{
-			MessageBoxW(nullptr, lpBuffer, nullptr, MB_ICONERROR);
-			if (LocalFree(lpBuffer))
+			else
 			{
-				return GetLastError();
+				return err; // unexpected and unable to display
 			}
+		}
+		MessageBoxW(nullptr, lpBuffer, nullptr, MB_ICONERROR);
+		if (LocalFree(lpBuffer))
+		{
+			return GetLastError();
 		}
 		return 0;
 	}
