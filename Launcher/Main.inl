@@ -59,7 +59,7 @@ UINT Main()
 					DWORD lastError;
 					while (true)
 					{
-						GetPrivateProfileStringW(L"LaunchApp", L"lpAppPath", nullptr, lpBuffer, length, file);
+						GetPrivateProfileStringW(L"LaunchApp", L"AppPath", nullptr, lpBuffer, length, file);
 						lastError = GetLastError();
 						if (lastError == ERROR_MORE_DATA) //lpBuffer too small
 						{
@@ -81,7 +81,7 @@ UINT Main()
 					}
 					while (true)
 					{
-						GetPrivateProfileStringW(L"LaunchApp", L"lpWorkingDirectory", nullptr, lpBuffer, length, file);
+						GetPrivateProfileStringW(L"LaunchApp", L"WorkingDirectory", nullptr, lpBuffer, length, file);
 						lastError = GetLastError();
 						if (lastError == ERROR_MORE_DATA) //lpBuffer too small
 						{
@@ -103,7 +103,7 @@ UINT Main()
 					}
 					while (true)
 					{
-						GetPrivateProfileStringW(L"LaunchApp", L"lpCommandLine", nullptr, lpBuffer, length, file);
+						GetPrivateProfileStringW(L"LaunchApp", L"CommandLine", nullptr, lpBuffer, length, file);
 						lastError = GetLastError();
 						if (lastError == ERROR_MORE_DATA) //lpBuffer too small
 						{
