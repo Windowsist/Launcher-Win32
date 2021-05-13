@@ -16,8 +16,8 @@ LPWSTR ExpEnvW(LPCWSTR lpSrc)
 
 inline VOID PutEnvW(LPWSTR lpEnv)
 {
-	BOOL result = NULL;
-	while (!result)
+	BOOL result;
+	do
 	{
 		int i, len = lstrlenW(lpEnv);
 		for (i = 0; i < len; i++)
@@ -41,5 +41,5 @@ inline VOID PutEnvW(LPWSTR lpEnv)
 		{
 			RaiseException(GetLastError(), 0, 0, nullptr);
 		}
-	}
+	} while (!result);
 }

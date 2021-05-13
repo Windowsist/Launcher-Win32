@@ -49,11 +49,7 @@ UINT Main()
 			{ // stack: DWORD length, LPWSTR lpBuffer;
 				DWORD length = 8;
 				// LPWSTR lpBuffer = (LPWSTR)Malloc((length = 8) * sizeof(wchar_t));
-				LPWSTR lpBuffer = nullptr;
-				while (!lpBuffer)
-				{
-					lpBuffer = (LPWSTR)Malloc(length * sizeof(wchar_t));
-				}
+				LPWSTR lpBuffer = (LPWSTR)Malloc(length * sizeof(wchar_t));
 				__try // ensure lpBuffer be freed
 				{ // stack: DWORD lastError;
 					DWORD lastError;
@@ -169,8 +165,8 @@ UINT Main()
 		}
 		{ // stack: PROCESS_INFORMATION pi; BOOL success;
 			PROCESS_INFORMATION pi;
-			BOOL success = FALSE;
-			while (!success)
+			BOOL success;
+			do
 			{
 				{ // stack: STARTUPINFOW si
 					STARTUPINFOW si = { sizeof(STARTUPINFOW) };
@@ -191,8 +187,7 @@ UINT Main()
 				{
 					RaiseException(GetLastError(), 0, 0, nullptr);
 				}
-			}
-
+			} while (!success);
 		} // clean: PROCESS_INFORMATION pi; BOOL success;
 	}
 	__finally // ensure lpAppPath, lpWorkingDirectory, lpCommandLine be freed

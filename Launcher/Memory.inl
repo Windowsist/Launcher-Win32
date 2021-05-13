@@ -3,21 +3,21 @@ HANDLE hProcessHeap;
 
 inline LPVOID Malloc(SIZE_T dwBytes)
 {
-	LPVOID result = nullptr;
-	while (!result)
+	LPVOID result;
+	do
 	{
 		result = HeapAlloc(hProcessHeap, HEAP_GENERATE_EXCEPTIONS, dwBytes);
-	}
+	} while (!result);
 	return result;
 }
 
 inline LPVOID ReAlloc(LPVOID lpMem, SIZE_T dwBytes)
 {
-	LPVOID result = nullptr;
-	while (!result)
+	LPVOID result;
+	do
 	{
 		result = HeapReAlloc(hProcessHeap, HEAP_GENERATE_EXCEPTIONS, lpMem, dwBytes);
-	}
+	} while (!result);
 	return result;
 }
 

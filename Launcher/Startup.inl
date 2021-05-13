@@ -57,8 +57,8 @@ __declspec(noinline) UINT __Startup() // noinline: ensure stack will be cleaned 
 {
 	__try
 	{
-		hProcessHeap = GetProcessHeap(); // initialize global
-		if (!hProcessHeap)
+		// initialize global
+		while ((hProcessHeap = GetProcessHeap()) == nullptr)
 		{
 			RaiseException(GetLastError(), 0, 0, nullptr);
 		}
