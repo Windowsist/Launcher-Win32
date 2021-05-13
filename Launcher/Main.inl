@@ -8,7 +8,7 @@
 // )
 
 
-UINT Main()
+void Main()
 { // stack: LPWSTR lpAppPath, lpWorkingDirectory, lpCommandLine;
 	LPWSTR lpAppPath = nullptr, lpWorkingDirectory = nullptr, lpCommandLine = nullptr;
 	__try // ensure lpAppPath, lpWorkingDirectory, lpCommandLine be freed
@@ -205,5 +205,4 @@ UINT Main()
 			Free(lpCommandLine);
 		}
 	}
-	return 0;
 } // clean: LPWSTR lpAppPath, lpWorkingDirectory, lpCommandLine;

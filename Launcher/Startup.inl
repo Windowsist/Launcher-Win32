@@ -62,7 +62,8 @@ __declspec(noinline) UINT __Startup() // noinline: ensure stack will be cleaned 
 		{
 			RaiseException(GetLastError(), 0, 0, nullptr);
 		}
-		return Main(); // invoke main
+		Main(); // invoke main
+		return 0U;
 	}
 	__except (filter(GetExceptionCode())) //display error information
 	{
