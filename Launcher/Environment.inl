@@ -1,13 +1,13 @@
 ﻿
 LPWSTR ExpEnvW(LPCWSTR lpSrc)
 {
-	DWORD len = ExpandEnvironmentStringsW(lpSrc, nullptr, 0);
-	if (!len)
+	DWORD len;
+	while ((len = ExpandEnvironmentStringsW(lpSrc, nullptr, 0)) == 0)
 	{
 		RaiseException(GetLastError(), 0, 0, nullptr);
 	}
 	LPWSTR value = (LPWSTR)Malloc(len * sizeof(wchar_t));
-	if (!ExpandEnvironmentStringsW(lpSrc, value, len))
+	while (!ExpandEnvironmentStringsW(lpSrc, value, len))
 	{
 		RaiseException(GetLastError(), 0, 0, nullptr);
 	}

@@ -28,28 +28,28 @@ CXXFLAGS_RELEASE=/O2 /Ob2 /GL /GS-
 
 RFLAGS=/nologo
 
-Debug: build\Debug\Launcher.exe
+Debug: $(MAKEDIR)\build\Debug\Launcher.exe
 
-build\Debug\Launcher.exe: build\Debug Windowsist.WINAPI.manifest Launcher.cpp Memory.inl Environment.inl Main.inl Startup.inl build\Debug\Launcher.res
-	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) Launcher.cpp /Fo: build\Debug\ /Fd: build\Debug\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED build\Debug\Launcher.res OneCore.lib
+$(MAKEDIR)\build\Debug\Launcher.exe: $(MAKEDIR)\build\Debug $(MAKEDIR)\Windowsist.WINAPI.manifest $(MAKEDIR)\Launcher.cpp $(MAKEDIR)\Memory.inl $(MAKEDIR)\Environment.inl $(MAKEDIR)\Main.inl $(MAKEDIR)\Startup.inl $(MAKEDIR)\build\Debug\Launcher.res
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_DEBUG) $(MAKEDIR)\Launcher.cpp /Fo: $(MAKEDIR)\build\Debug\ /Fd: $(MAKEDIR)\build\Debug\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:$(MAKEDIR)\Windowsist.WINAPI.manifest /MANIFEST:EMBED $(MAKEDIR)\build\Debug\Launcher.res OneCore.lib
 
-build\Debug\Launcher.res: Launcher.rc
+$(MAKEDIR)\build\Debug\Launcher.res: $(MAKEDIR)\Launcher.rc
 	$(RC) $(RFLAGS) /fo $@ $**
 
-build\Debug:
+$(MAKEDIR)\build\Debug:
 	mkdir $@
 
-Release: build\Release\Launcher.exe
+Release: $(MAKEDIR)\build\Release\Launcher.exe
 
-build\Release\Launcher.exe: build\Release Windowsist.WINAPI.manifest Launcher.cpp Memory.inl Environment.inl Main.inl Startup.inl build\Release\Launcher.res
-	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) Launcher.cpp /Fo: build\Release\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:Windowsist.WINAPI.manifest /MANIFEST:EMBED build\Release\Launcher.res OneCore.lib
+$(MAKEDIR)\build\Release\Launcher.exe: $(MAKEDIR)\build\Release $(MAKEDIR)\Windowsist.WINAPI.manifest $(MAKEDIR)\Launcher.cpp $(MAKEDIR)\Memory.inl $(MAKEDIR)\Environment.inl $(MAKEDIR)\Main.inl $(MAKEDIR)\Startup.inl $(MAKEDIR)\build\Release\Launcher.res
+	$(CPP) $(CPPFLAGS) $(CPPFLAGS_RELEASE) $(MAKEDIR)\Launcher.cpp /Fo: $(MAKEDIR)\build\Release\ /Fe: $@ /link /ENTRY:Startup /SUBSYSTEM:WINDOWS /MANIFESTINPUT:$(MAKEDIR)\Windowsist.WINAPI.manifest /MANIFEST:EMBED $(MAKEDIR)\build\Release\Launcher.res OneCore.lib
 
-build\Release\Launcher.res: Launcher.rc
+$(MAKEDIR)\build\Release\Launcher.res: $(MAKEDIR)\Launcher.rc
 	$(RC) $(RFLAGS) /fo $@ $**
 
-build\Release:
+$(MAKEDIR)\build\Release:
 	mkdir $@
 
 clean:
-	@rd /s /q build
+	@rd /s /q $(MAKEDIR)\build
 

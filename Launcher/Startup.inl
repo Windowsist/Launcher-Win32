@@ -15,9 +15,8 @@ int filter(DWORD exceptionCode)
 	))
 	{
 		DWORD err = GetLastError();
-		if (err == ERROR_MUI_FILE_NOT_FOUND) // not system error, unexpected
-		{
-			if (!FormatMessageW
+		if ((err != ERROR_MUI_FILE_NOT_FOUND) ||
+			(!FormatMessageW
 			(
 				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				nullptr,
@@ -26,12 +25,7 @@ int filter(DWORD exceptionCode)
 				(LPWSTR)&lpBuffer,
 				0,
 				nullptr
-			))
-			{
-				return EXCEPTION_CONTINUE_SEARCH; // unexpected and unable to display
-			}
-		}
-		else
+			))) // not system error, unexpected
 		{
 			return EXCEPTION_CONTINUE_SEARCH; // unexpected and unable to display
 		}
